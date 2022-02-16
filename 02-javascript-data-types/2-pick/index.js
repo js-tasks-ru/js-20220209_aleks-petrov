@@ -5,5 +5,11 @@
  * @returns {object} - returns the new object
  */
 export const pick = (obj, ...fields) => {
-
+  const objTemp = new Object();
+  for (const iterator of fields) {
+    if (obj.hasOwnProperty(iterator)) {
+      objTemp[iterator] = obj[iterator];
+    }
+  }
+  return objTemp;
 };
