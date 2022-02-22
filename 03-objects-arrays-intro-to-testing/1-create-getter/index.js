@@ -10,7 +10,7 @@ export function createGetter(path) {
       if (obj.hasOwnProperty(iter)) {
         obj = obj[iter];
       } else {
-        return undefined;
+        return obj[iter];
       }
     }
     return obj;
