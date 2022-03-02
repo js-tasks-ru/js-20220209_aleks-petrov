@@ -59,26 +59,25 @@ export default class SortableTable {
     `;
   }
 
-  sort(field, directions = 'asc') {
-    const sortData = this._sortData(field, directions);
-    this.data = this._sortData(field, directions);
-    this.update();
-  }
-
-  _sortData(field, directions) {
-    const direction = directions === 'asc' ? 1 : -1;
+  sort(field, direction) {
+    const directions = {
+      'asc': 1,
+      'desc': -1
+    };
     const { sortType } = this.headerConfig.find(item => item.id === field);
 
-    return [...this.data].sort((a, b) => {
+    const sortData = [...this.data].sort((a, b) => {
       switch (sortType) {
       case 'number':
-        return direction * (a[field] - b[field]);
+        return directions[direction] * (a[field] - b[field]);
       case 'string':
-        return direction * a[field].localeCompare(b[field], ['ru', 'en']);
+        return directions[direction] * a[field].localeCompare(b[field], ['ru', 'en']);
       default:
         return 0;
       }
     });
+
+    this.update(sortData);
   }
 
   render() {
@@ -86,11 +85,26 @@ export default class SortableTable {
     this.element.innerHTML = this._getTable();
     this.element = this.element.firstElementChild;
 
-    this.subElements = this.element.querySelector('[data-element=body]');
+    this.subElements = this._getSubElements();
   }
 
-  update() {
-    this.subElements.innerHTML = this._getTableBody();
+  _getSubElements() {
+    const result = {};
+    const elements = this.element.querySelectorAll('[data-element]');
+    for (const subElement of elements) {
+      console.log('subElement', subElement);
+      console.log('subElement.dataset', subElement.dataset);
+      console.log('subElement.dataset.element', subElement.dataset.element);
+      const name = subElement.dataset.element;
+
+      result[name] = subElement;
+    }
+
+    return result;
+  }
+
+  update(newData = this.data) {
+    this.subElements.body.innerHTML = this._getTableRows(newData).join('');
   }
 
   remove() {
@@ -102,6 +116,7 @@ export default class SortableTable {
   destroy() {
     this.remove();
     this.element = null;
+    this.subElements = {};
   }
 }
 
